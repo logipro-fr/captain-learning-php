@@ -1,0 +1,26 @@
+#!/bin/bash
+
+source "./install-lib/load-env.sh"
+
+load_env
+
+USERID=$(id -u)
+GROUPID=$(id -g)
+
+export USERID
+export GROUPID
+
+function runPhpWith_Useful_Volume_And_WorkdirPath_That_Have_The_Same_Full_Path_In_Both_Dev_Local_Env_and_In_The_Container()
+{
+    if [ "$LOCALDEV_WORKING_DIR" = true ]; then
+        export WORKING_DIR=$PWD
+    fi;
+    docker compose \
+        $DOCKER_COMPOSE_FILES \
+        run \
+        --rm \
+        -v "$PWD":"$PWD" \
+        php php "$@"
+}
+
+runPhpWith_Useful_Volume_And_WorkdirPath_That_Have_The_Same_Full_Path_In_Both_Dev_Local_Env_and_In_The_Container "$@"

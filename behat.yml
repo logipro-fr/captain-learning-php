@@ -1,0 +1,22 @@
+# behat.yml
+default:
+  autoload:
+    '': '%paths.base%/tests/features'
+  formatters:
+    progress: true
+    pretty: true
+  suites:
+    default:
+      paths:
+        - '%paths.base%/features/'
+      contexts:
+        - Tests\Features\BasicBehatScenarioContext
+#  extensions:
+#    DVDoug\Behat\CodeCoverage\Extension:
+#      filter:
+#        include:
+#          directories:
+#            'src': ~
+#      reports:
+#        text:
+#          showColors: true
