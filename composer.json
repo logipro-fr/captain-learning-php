@@ -15,7 +15,8 @@
         }
     ],
     "require": {
-        "php": ">=8.4"
+        "php": ">=8.4",
+        "symfony/http-client": "^7.3"
     },
     "require-dev": {
         "infection/extension-installer": "0.1.2",
