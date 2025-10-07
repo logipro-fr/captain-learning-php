@@ -2,23 +2,34 @@
 
 namespace Tests\Integration;
 
+use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
-use PHPUnit\Framework\TestCase;
+use CaptainLearningPhp\DTO\Formation\FormationCreateDTO;
+use Tests\Unit\CaptainLearningClientTest as UnitCaptainLearningClientTest;
+use Tests\Unit\GetFile;
 
-class CaptainLearningClientIntegrationTest extends TestCase
+class CaptainLearningClientTest extends UnitCaptainLearningClientTest
 {
     public function testApiRealCall(): void
     {
         // Ce test fait de vrais appels HTTP - à utiliser avec prudence
 
         // Arrange
-        $client = new CaptainLearningClient();
+        $client = new CaptainLearningClient(
+            apiUrls: new ApiUrls('http://172.17.0.1:11780')
+        );
         $nameFormation = "CaptainLearningClient integration";
         $codeFormation = "E" . uniqid();
-        $filepath = dirname(__DIR__, 2) . '/tests/Resources/exemple.pdf';
+        $getFile = new GetFile();
+        $file = $getFile->buildUploadedFile();
 
+        $createFormationDto = new FormationCreateDTO(
+            intituleFormation: $nameFormation,
+            code: $codeFormation,
+            file: $file
+        );
         // Act
-        $response = $client->createFormation($nameFormation, $codeFormation, $filepath);
+        $response = $client->createFormation($createFormationDto);
 
         // Assert
         $this->assertInstanceOf(CaptainLearningClient::class, $client);
@@ -39,5 +50,4 @@ class CaptainLearningClientIntegrationTest extends TestCase
         $this->assertIsString($formationId);
         $this->assertEquals('cl_formation_' . $codeFormation, $formationId);
     }
-
 }

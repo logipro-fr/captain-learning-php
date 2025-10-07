@@ -1,10 +1,10 @@
 {
     "name": "logipro/captain-learning-php",
-    "type": "app",
+    "type": "library",
     "description": "Client PHP for Captain Learning API",
     "keywords": ["php", "DDT"],
     "homepage": "https://github.com/logipro-fr/captain-learning-php",
-    "license": "Copyrighted",
+    "license": "proprietary",
     "minimum-stability": "stable",
     "authors": [
         {
@@ -16,7 +16,8 @@
     ],
     "require": {
         "php": ">=8.4",
-        "symfony/http-client": "^7.3"
+        "symfony/http-client": "^7.3",
+        "symfony/http-foundation": "^7.3"
     },
     "require-dev": {
         "infection/extension-installer": "0.1.2",
