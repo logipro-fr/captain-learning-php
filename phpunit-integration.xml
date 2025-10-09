@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.3/phpunit.xsd"
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
   backupGlobals="false"
   colors="true"
-  bootstrap="tests/bootstrap.php"
-  cacheDirectory="var/.phpunit.cache">
-  <coverage/>
+  bootstrap="tests/bootstrap.php">
+  
   <testsuites>
-    <testsuite name="all">
+    <testsuite name="integration">
       <directory suffix="Test.php">tests/integration</directory>
     </testsuite>
   </testsuites>
-  <source>
+  
+  <!-- Pour PHPUnit 9, utilisez coverage au lieu de source -->
+  <coverage processUncoveredFiles="true">
     <include>
       <directory suffix=".php">src</directory>
     </include>
-  </source>
+  </coverage>
 </phpunit>

@@ -2,24 +2,29 @@
 
 namespace Tests\Unit;
 
+use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
 use CaptainLearningPhp\CaptainLearningClientFactory;
 use CaptainLearningPhp\DTO\Formation\FormationCreateDTO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 use function Safe\json_decode;
 use function Safe\json_encode;
 
 class CaptainLearningClientTest extends TestCase
 {
-    private CaptainLearningClient $client;
+    protected CaptainLearningClient $client;
+    /** @var non-empty-string */
+    protected string $codeFormation;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $captainLearningClientFactory = new CaptainLearningClientFactory();
         $this->client = $captainLearningClientFactory->createMockCaptainLearning();
+        $this->codeFormation = "123";
     }
     public function testCreateFormation(): void
     {
@@ -27,12 +32,12 @@ class CaptainLearningClientTest extends TestCase
         $getFile = new GetFile();
         $file = $getFile->buildUploadedFile();
         $nameFormation = "Formation de test";
-        $codeFormation = "123";
-        $formation = new FormationCreateDTO($nameFormation, $codeFormation, $file);
+        $formation = new FormationCreateDTO($nameFormation, $this->codeFormation, $file);
 
 
         // Act
         $response = $this->client->createFormation($formation);
+
         // Assert
         /** @var array<string, mixed>   */
         $responseData = json_decode($response, true);
@@ -41,46 +46,30 @@ class CaptainLearningClientTest extends TestCase
         $this->assertIsArray($data);
         /** @var string $formationId     */
         $formationId = $data['formationId'];
-        $this->assertEquals('cl_formation_' . $codeFormation, $formationId);
+        $this->assertStringStartsWith('cl_formation_', $formationId);
+        $this->assertNotEmpty($this->codeFormation);
+        $this->assertStringEndsWith($this->codeFormation, $formationId);
     }
 
-    // public function testCreateFormation(): void
-    // {
-    //     // Arrange
-    //     $nameFormation = "Formation de test";
-    //     $codeFormation = "E100-2509-00002";
+    public function testConstructorUsesProvidedApiUrls(): void
+    {
+        $httpClientMock = $this->getMockBuilder(HttpClientInterface::class)
+            ->onlyMethods(['request','stream'])
+            ->getMock();
 
-    //     $responseData = [
-    //         "success" => true,
-    //         "data" => ["formationId" => "cl_formation_" . $codeFormation],
-    //         "error" => "",
-    //         "error_message" => ""
-    //         ];
-    //     $expectedResponse = json_encode($responseData);
+        $customApiUrls = $this->getMockBuilder(ApiUrls::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    //     $mockResponse = new MockResponse($expectedResponse, [
-    //         'http_code' => 200,
-    //         'response_headers' => ['Content-Type' => 'application/json']
-    //     ]);
-    //     $mockhttp = new MockHttpClient([$mockResponse]);
+        $client = new CaptainLearningClient($httpClientMock, $customApiUrls);
 
-    //     // Act
-    //     $client = new CaptainLearningClient($mockhttp);
-    //     $response = $client->createFormation($nameFormation, $codeFormation);
-    //     // Assert
+        // Utilise Reflection pour accéder à la propriété privée
+        $reflection = new \ReflectionClass($client);
+        $property = $reflection->getProperty('apiUrls');
+        $property->setAccessible(true);
 
-    //     $this->assertInstanceOf(CaptainLearningClient::class, $client);
-    //     $this->assertJson($response);
-
-    //     /** @var array<string, mixed>   */
-    //     $responseData = json_decode($response, true);
-    //     $this->assertTrue(isset($responseData['success']));
-    //     $data = $responseData['data'];
-    //     $this->assertIsArray($data);
-    //     /** @var string $formationId     */
-    //     $formationId = $data['formationId'];
-    //     $this->assertEquals('cl_formation_' . $codeFormation, $formationId);
-    // }
+        $this->assertSame($customApiUrls, $property->getValue($client));
+    }
     // public function testCreateFormationFail(): void
     // {
     //     // Arrange

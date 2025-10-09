@@ -8,10 +8,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FormationService
 {
+    private HttpClientInterface $httpClient;
+    private ApiUrls $apiUrls;
+
     public function __construct(
-        private HttpClientInterface $httpClient,
-        private ApiUrls $apiUrls
+        HttpClientInterface $httpClient,
+        ApiUrls $apiUrls
     ) {
+        $this->httpClient = $httpClient;
+        $this->apiUrls = $apiUrls;
     }
 
     public function create(FormationCreateDTO $formation): string

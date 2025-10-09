@@ -28,4 +28,17 @@ class CaptainLearningClientFactoryTest extends TestCase
 
         $method->invoke($factory, 'POST', '/v1/badRoutes', []);
     }
+    public function testCallableResponseThrowsOnNonPostMethod(): void
+    {
+        $factory = new CaptainLearningClientFactory();
+
+        $reflection = new \ReflectionClass($factory);
+        $method = $reflection->getMethod('callableResponse');
+        $method->setAccessible(true);
+
+        $this->expectException(BadRequestException::class);
+
+        // Appel avec 'GET' au lieu de 'POST'
+        $method->invoke($factory, 'GET', '/api/external/v1/formation', []);
+    }
 }

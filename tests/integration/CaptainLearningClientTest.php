@@ -4,50 +4,33 @@ namespace Tests\Integration;
 
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
-use CaptainLearningPhp\DTO\Formation\FormationCreateDTO;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Tests\Unit\CaptainLearningClientTest as UnitCaptainLearningClientTest;
-use Tests\Unit\GetFile;
 
 class CaptainLearningClientTest extends UnitCaptainLearningClientTest
 {
-    public function testApiRealCall(): void
+    private const PORT = 11780;
+    private const HOST = '172.17.0.1';
+    private const BASE_URL = 'http://' . self::HOST . ':' . self::PORT;
+
+    public function setUp(): void
     {
-        // Ce test fait de vrais appels HTTP - à utiliser avec prudence
-
-        // Arrange
-        $client = new CaptainLearningClient(
-            apiUrls: new ApiUrls('http://172.17.0.1:11780')
+        $connection = @fsockopen(self::HOST, self::PORT, $errno, $errstr, 2);
+        if (!$connection) {
+            $this->markTestSkipped(
+                sprintf(
+                    'CaptainLearning API is not reachable at %s:%d - %s',
+                    self::HOST,
+                    self::PORT,
+                    $errstr ?: 'Connection failed'
+                )
+            );
+        }
+        fclose($connection);
+        $this->client = new CaptainLearningClient(
+            new CurlHttpClient(),
+            new ApiUrls(self::BASE_URL)
         );
-        $nameFormation = "CaptainLearningClient integration";
-        $codeFormation = "E" . uniqid();
-        $getFile = new GetFile();
-        $file = $getFile->buildUploadedFile();
-
-        $createFormationDto = new FormationCreateDTO(
-            intituleFormation: $nameFormation,
-            code: $codeFormation,
-            file: $file
-        );
-        // Act
-        $response = $client->createFormation($createFormationDto);
-
-        // Assert
-        $this->assertInstanceOf(CaptainLearningClient::class, $client);
-        $this->assertJson($response);
-
-        $responseData = json_decode($response, true);
-        $this->assertIsArray($responseData);
-
-        $this->assertArrayHasKey('success', $responseData);
-        $this->assertTrue($responseData['success']);
-
-        $this->assertArrayHasKey('data', $responseData);
-        $data = $responseData['data'];
-        $this->assertIsArray($data);
-
-        $this->assertArrayHasKey('formationId', $data);
-        $formationId = $data['formationId'];
-        $this->assertIsString($formationId);
-        $this->assertEquals('cl_formation_' . $codeFormation, $formationId);
+        $this->codeFormation = uniqid();
     }
 }
