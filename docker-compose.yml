@@ -23,6 +23,7 @@ services:
       dockerfile: docker/php/Dockerfile
     user: '${USERID}:${GROUPID}'
     volumes:
+      - .:/var/${COMPOSE_PROJECT_NAME}
       - ${DATA_PATH_STORE:-${DATA_PATH}}:/var/${COMPOSE_PROJECT_NAME}/${DATA_PATH}
       - ${OPTIONAL_VOLUME:-/dev/null:/dev/null}
     working_dir: ${WORKING_DIR:-/var/${COMPOSE_PROJECT_NAME}}

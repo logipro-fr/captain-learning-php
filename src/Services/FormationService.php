@@ -4,6 +4,8 @@ namespace CaptainLearningPhp\Services;
 
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\DTO\Formation\FormationCreateDTO;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FormationService
@@ -21,19 +23,28 @@ class FormationService
 
     public function create(FormationCreateDTO $formation): string
     {
-
         $body = [
-            'intituleFormation' => $formation->intituleFormation,
-            'code' => $formation->code,
-            'document' => $formation->file !== null ? fopen($formation->file->getPathname(), 'r') : null,
+        'intituleFormation' => $formation->intituleFormation,
+        'code' => $formation->code,
         ];
+
+        if ($formation->file !== null) {
+            $body['document'] = DataPart::fromPath(
+                $formation->file->getPathname(),
+                $formation->file->getClientOriginalName(),
+                $formation->file->getMimeType()
+            );
+        }
+
+        $formData = new FormDataPart($body);
+
 
         $response = $this->httpClient->request('POST', $this->apiUrls->createFormation(), [
             'headers' => [
                 'Accept' => 'application/json',
                 'User-Agent' => 'CaptainLearningClient/1.0'
-            ],
-            'body' => $body
+            ] + $formData->getPreparedHeaders()->toArray(),
+            'body' => $formData->bodyToIterable()
         ]);
 
         return $response->getContent(false);

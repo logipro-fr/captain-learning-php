@@ -15,7 +15,6 @@ export GROUPID=$GROUP_ID
 
 
 docker compose \
-  $DOCKER_COMPOSE_FILES \
   run ${moinsit} \
   --rm \
   --user $USER_ID:$GROUP_ID \
