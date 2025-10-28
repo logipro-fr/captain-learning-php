@@ -4,7 +4,7 @@ namespace CaptainLearningPhp\DTO\Formation;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FormationCreateDTO
+class FormationCreateRequest
 {
     public string $intituleFormation;
     public string $code;

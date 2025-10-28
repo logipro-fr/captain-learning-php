@@ -5,11 +5,10 @@ namespace Tests\Unit;
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
 use CaptainLearningPhp\CaptainLearningClientFactory;
-use CaptainLearningPhp\DTO\Formation\FormationCreateDTO;
+use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
+use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-
-use function Safe\json_decode;
 
 class CaptainLearningClientTest extends TestCase
 {
@@ -29,45 +28,44 @@ class CaptainLearningClientTest extends TestCase
         $getFile = new GetFile();
         $file = $getFile->buildUploadedFile();
         $nameFormation = "Formation de test";
-        $formation = new FormationCreateDTO($nameFormation, $this->codeFormation, $file);
+        $formation = new FormationCreateRequest($nameFormation, $this->codeFormation, $file);
 
 
         // Act
-        $response = $this->client->createFormation($formation);
+        $responseCreateDTO = $this->client->createFormation($formation);
 
         // Assert
-        /** @var array<string, mixed>   */
-        $responseData = json_decode($response, true);
-        $this->assertTrue(isset($responseData['success']));
-        $data = $responseData['data'];
-        $this->assertIsArray($data);
-        /** @var string $formationId     */
-        $formationId = $data['formationId'];
-        $this->assertStringStartsWith('cl_formation_', $formationId);
-        $this->assertNotEmpty($this->codeFormation);
-        $this->assertStringEndsWith($this->codeFormation, $formationId);
+        $this->assertInstanceOf(FormationCreateResponse::class, $responseCreateDTO);
+        $this->assertTrue($responseCreateDTO->success);
+        $this->assertTrue($responseCreateDTO->data !== null);
+
+        $this->assertArrayHasKey('formationId', $responseCreateDTO->data);
+        $formationID = $responseCreateDTO->data['formationId'];
+        $this->assertIsString($formationID);
+        $this->assertStringStartsWith('cl_formation_', $formationID);
+        $this->assertStringEndsWith($this->codeFormation, $formationID);
+        $this->assertEquals('', $responseCreateDTO->error);
+        $this->assertEquals('', $responseCreateDTO->error_message);
     }
 
     public function testCreateFormationWithoutFile(): void
     {
         // Arrange
         $nameFormation = "Formation de test sans fichier";
-        $formation = new FormationCreateDTO($nameFormation, $this->codeFormation);
+        $formation = new FormationCreateRequest($nameFormation, $this->codeFormation);
 
-        // Act
-        $response = $this->client->createFormation($formation);
-
+        $responseCreateDTO = $this->client->createFormation($formation);
         // Assert
-        /** @var array<string, mixed>   */
-        $responseData = json_decode($response, true);
-        $this->assertTrue(isset($responseData['success']));
-        $data = $responseData['data'];
-        $this->assertIsArray($data);
-        /** @var string $formationId     */
-        $formationId = $data['formationId'];
-        $this->assertStringStartsWith('cl_formation_', $formationId);
-        $this->assertNotEmpty($this->codeFormation);
-        $this->assertStringEndsWith($this->codeFormation, $formationId);
+        $this->assertInstanceOf(FormationCreateResponse::class, $responseCreateDTO);
+        $this->assertTrue($responseCreateDTO->success);
+        $this->assertTrue($responseCreateDTO->data !== null);
+        $this->assertArrayHasKey('formationId', $responseCreateDTO->data);
+        $formationID = $responseCreateDTO->data['formationId'];
+        $this->assertIsString($formationID);
+        $this->assertStringStartsWith('cl_formation_', $formationID);
+        $this->assertStringEndsWith($this->codeFormation, $formationID);
+        $this->assertEquals('', $responseCreateDTO->error);
+        $this->assertEquals('', $responseCreateDTO->error_message);
     }
 
     public function testConstructorUsesProvidedApiUrls(): void

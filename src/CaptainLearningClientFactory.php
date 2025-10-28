@@ -2,7 +2,7 @@
 
 namespace CaptainLearningPhp;
 
-use CaptainLearningPhp\Domain\BaseDir;
+use CaptainLearningPhp\BaseDir;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;

@@ -4,6 +4,8 @@ namespace Tests\Integration;
 
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
+use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
+use CaptainLearningPhp\Exceptions\FormationBadRequestException;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Tests\Unit\CaptainLearningClientTest as UnitCaptainLearningClientTest;
 
@@ -32,5 +34,14 @@ class CaptainLearningClientTest extends UnitCaptainLearningClientTest
             new ApiUrls(self::BASE_URL)
         );
         $this->codeFormation = uniqid();
+    }
+
+    public function testCreateFormationThrowsFormationBadRequestException(): void
+    {
+        $this->expectException(FormationBadRequestException::class);
+
+        $formation = new FormationCreateRequest('test', '');
+
+        $this->client->createFormation($formation);
     }
 }

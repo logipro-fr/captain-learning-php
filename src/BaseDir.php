@@ -1,12 +1,12 @@
 <?php
 
-namespace CaptainLearningPhp\Domain;
+namespace CaptainLearningPhp;
 
 use function Safe\realpath;
 
 class BaseDir
 {
-    private const DIRECTORY_PATH = __DIR__ . '/../..';
+    private const DIRECTORY_PATH = __DIR__ . '/..';
 
     public static function getFullPath(string $relativePath): string
     {
