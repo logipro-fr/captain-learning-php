@@ -9,9 +9,22 @@ fi
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 
-docker run ${moinsit} --rm \
-  --volume $PWD:/app \
+export USERID=$USER_ID
+export GROUPID=$GROUP_ID
+
+
+
+docker compose \
+  run ${moinsit} \
+  --rm \
   --user $USER_ID:$GROUP_ID \
-  --name composer-running-script \
-  -v "$PWD":/usr/src \
-  composer:2.8.6 composer $@
+  -v "$PWD":"$PWD" \
+  php composer $@
+
+
+# docker run ${moinsit} --rm \
+#   --volume $PWD:/app \
+#   --user $USER_ID:$GROUP_ID \
+#   --name composer-running-script \
+#   -v "$PWD":"$PWD" \
+#   captain-learning-php-php composer $@

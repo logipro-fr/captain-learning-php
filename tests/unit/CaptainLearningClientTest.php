@@ -2,86 +2,89 @@
 
 namespace Tests\Unit;
 
+use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
+use CaptainLearningPhp\CaptainLearningClientFactory;
+use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
+use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
-
-use function Safe\json_decode;
-use function Safe\json_encode;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class CaptainLearningClientTest extends TestCase
 {
+    protected CaptainLearningClient $client;
+    /** @var non-empty-string */
+    protected string $codeFormation;
+
+    protected function setUp(): void
+    {
+        $captainLearningClientFactory = new CaptainLearningClientFactory();
+        $this->client = $captainLearningClientFactory->createMockCaptainLearning();
+        $this->codeFormation = "123";
+    }
     public function testCreateFormation(): void
     {
         // Arrange
+        $getFile = new GetFile();
+        $file = $getFile->buildUploadedFile();
         $nameFormation = "Formation de test";
-        $codeFormation = "E100-2509-00002";
+        $formation = new FormationCreateRequest($nameFormation, $this->codeFormation, $file);
 
-        $responseData = [
-            "success" => true,
-            "data" => ["formationId" => "cl_formation_" . $codeFormation],
-            "error" => "",
-            "error_message" => ""
-            ];
-        $expectedResponse = json_encode($responseData);
-
-        $mockResponse = new MockResponse($expectedResponse, [
-            'http_code' => 200,
-            'response_headers' => ['Content-Type' => 'application/json']
-        ]);
-        $mockhttp = new MockHttpClient([$mockResponse]);
 
         // Act
-        $client = new CaptainLearningClient($mockhttp);
-        $response = $client->createFormation($nameFormation, $codeFormation);
+        $responseCreateDTO = $this->client->createFormation($formation);
+
         // Assert
+        $this->assertInstanceOf(FormationCreateResponse::class, $responseCreateDTO);
+        $this->assertTrue($responseCreateDTO->success);
+        $this->assertTrue($responseCreateDTO->data !== null);
 
-        $this->assertInstanceOf(CaptainLearningClient::class, $client);
-        $this->assertJson($response);
-
-        /** @var array<string, mixed>   */
-        $responseData = json_decode($response, true);
-        $this->assertTrue(isset($responseData['success']));
-        $data = $responseData['data'];
-        $this->assertIsArray($data);
-        /** @var string $formationId     */
-        $formationId = $data['formationId'];
-        $this->assertEquals('cl_formation_' . $codeFormation, $formationId);
+        $this->assertArrayHasKey('formationId', $responseCreateDTO->data);
+        $formationID = $responseCreateDTO->data['formationId'];
+        $this->assertIsString($formationID);
+        $this->assertStringStartsWith('cl_formation_', $formationID);
+        $this->assertStringEndsWith($this->codeFormation, $formationID);
+        $this->assertEquals('', $responseCreateDTO->error);
+        $this->assertEquals('', $responseCreateDTO->error_message);
     }
-    public function testCreateFormationFail(): void
+
+    public function testCreateFormationWithoutFile(): void
     {
         // Arrange
-        $nameFormation = "Formation de test";
-        $codeFormation = "E100-2509-00002";
+        $nameFormation = "Formation de test sans fichier";
+        $formation = new FormationCreateRequest($nameFormation, $this->codeFormation);
 
-        $responseData = [
-            'success' => false,
-            'data' => null,
-            'error' => 'Doctrine\\DBAL\\Exception\\UniqueConstraintViolationException',
-            'error_message' => 'An exception occurred while executing a query: SQLSTATE[23000]:
-                 Integrity constraint violation: 19 UNIQUE constraint failed: formations.formation_id'
-        ];
-
-        $expectedResponse = json_encode($responseData);
-        $mockResponse = new MockResponse($expectedResponse, [
-            'http_code' => 400,
-            'response_headers' => ['Content-Type' => 'application/json']
-        ]);
-        $mockhttp = new MockHttpClient([$mockResponse]);
-
-        // Act
-        $client = new CaptainLearningClient($mockhttp);
-        $response = $client->createFormation($nameFormation, $codeFormation);
-
+        $responseCreateDTO = $this->client->createFormation($formation);
         // Assert
-        $this->assertInstanceOf(CaptainLearningClient::class, $client);
-        $this->assertJson($response);
+        $this->assertInstanceOf(FormationCreateResponse::class, $responseCreateDTO);
+        $this->assertTrue($responseCreateDTO->success);
+        $this->assertTrue($responseCreateDTO->data !== null);
+        $this->assertArrayHasKey('formationId', $responseCreateDTO->data);
+        $formationID = $responseCreateDTO->data['formationId'];
+        $this->assertIsString($formationID);
+        $this->assertStringStartsWith('cl_formation_', $formationID);
+        $this->assertStringEndsWith($this->codeFormation, $formationID);
+        $this->assertEquals('', $responseCreateDTO->error);
+        $this->assertEquals('', $responseCreateDTO->error_message);
+    }
 
-        /** @var array<string, mixed>   */
-        $responseData = json_decode($response, true);
-        $this->assertTrue(isset($responseData['success']));
-        $this->assertFalse($responseData['success']);
-        $this->assertEquals("Doctrine\\DBAL\\Exception\\UniqueConstraintViolationException", $responseData['error']);
+    public function testConstructorUsesProvidedApiUrls(): void
+    {
+        $httpClientMock = $this->getMockBuilder(HttpClientInterface::class)
+            ->onlyMethods(['request','stream'])
+            ->getMock();
+
+        $customApiUrls = $this->getMockBuilder(ApiUrls::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $client = new CaptainLearningClient($httpClientMock, $customApiUrls);
+
+        // Utilise Reflection pour accéder à la propriété privée
+        $reflection = new \ReflectionClass($client);
+        $property = $reflection->getProperty('apiUrls');
+        $property->setAccessible(true);
+
+        $this->assertSame($customApiUrls, $property->getValue($client));
     }
 }

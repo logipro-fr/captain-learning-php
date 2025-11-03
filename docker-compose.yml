@@ -23,6 +23,7 @@ services:
       dockerfile: docker/php/Dockerfile
     user: '${USERID}:${GROUPID}'
     volumes:
+      - .:/var/${COMPOSE_PROJECT_NAME}
       - ${DATA_PATH_STORE:-${DATA_PATH}}:/var/${COMPOSE_PROJECT_NAME}/${DATA_PATH}
       - ${OPTIONAL_VOLUME:-/dev/null:/dev/null}
     working_dir: ${WORKING_DIR:-/var/${COMPOSE_PROJECT_NAME}}
@@ -38,6 +39,6 @@ networks:
     enable_ipv6: true
     ipam:
       config:
-        - subnet: fdff:1:1::/112
-          gateway: fdff:1:1::1
+        - subnet: fdff:5:1::/112
+          gateway: fdff:5:1::1
 

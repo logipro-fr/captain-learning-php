@@ -1,3 +1,3 @@
 <?php
 
-echo "Welcome to captain-learning-php!";
+echo "Welcome to Client PHP Captain Learning API";

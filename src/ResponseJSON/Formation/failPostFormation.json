@@ -1,0 +1,6 @@
+{
+  "success": false,
+  "data": null,
+  "error": "CaptainLearning\\Domain\\Model\\Formation\\Exceptions\\FormationBadRequestException",
+  "error_message": "Bad request exception with content 'The formation title cannot be empty'"
+}

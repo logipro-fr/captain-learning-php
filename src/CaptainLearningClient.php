@@ -2,34 +2,29 @@
 
 namespace CaptainLearningPhp;
 
+use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
+use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
+use CaptainLearningPhp\Services\Formation\FormationService;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class CaptainLearningClient
+class CaptainLearningClient implements CaptainLearningClientInterface
 {
+    private FormationService $formationService;
+    private HttpClientInterface $httpClient;
+    private ApiUrls $apiUrls;
+
     public function __construct(
-        private HttpClientInterface $httpClient = new CurlHttpClient()
+        ?HttpClientInterface $httpClient = null,
+        ?ApiUrls $apiUrls = null
     ) {
+        $this->httpClient = $httpClient ?? new CurlHttpClient();
+        $this->apiUrls = $apiUrls ?? new  ApiUrls();
+        $this->formationService = new FormationService($this->httpClient, $this->apiUrls);
     }
 
-    public function createFormation(string $name, string $code, ?string $filePath = null): string
+    public function createFormation(FormationCreateRequest $formation): FormationCreateResponse
     {
-        $body = [
-            'intituleFormation' => $name,
-            'code' => $code
-        ];
-        if ($filePath !== null && file_exists($filePath)) {
-            $body['document'] = fopen($filePath, 'r');
-        }
-
-        $response = $this->httpClient->request('POST', 'http://172.17.0.1:11780/api/external/v1/formation', [
-            'headers' => [
-                'Accept' => 'application/json',
-                'User-Agent' => 'CaptainLearningClient/1.0'
-            ],
-            'body' => $body
-        ]);
-
-        return $response->getContent(false);
+        return $this->formationService->create($formation);
     }
 }
