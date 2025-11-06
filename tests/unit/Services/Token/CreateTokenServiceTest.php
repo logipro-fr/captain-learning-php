@@ -83,21 +83,21 @@ class CreateTokenServiceTest extends TestCase
         $this->expectException(TokenBadRequestException::class);
         $sut->execute('cl_apk_invalid', 'sk_invalid');
     }
-     public function testFailRequest(): void
-     {
+    public function testFailRequest(): void
+    {
         $apiUrls = new ApiUrls();
 
         $httpClientMock = $this->getMockBuilder(HttpClientInterface::class)
-            ->onlyMethods(['request', 'stream'])
-            ->getMock();
+           ->onlyMethods(['request', 'stream'])
+           ->getMock();
 
         $httpClientMock->expects($this->once())
-            ->method('request')
-            ->with(
-                $this->equalTo('POST'),
-                $this->equalTo($apiUrls->createToken()),
-            )
-            ->willThrowException(new \Exception('Network error'));
+           ->method('request')
+           ->with(
+               $this->equalTo('POST'),
+               $this->equalTo($apiUrls->createToken()),
+           )
+           ->willThrowException(new \Exception('Network error'));
 
         $sut = new CreateTokenService(
             $httpClientMock,
@@ -107,5 +107,5 @@ class CreateTokenServiceTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Network error');
         $sut->execute('cl_apk_123', 'sk_123456');
-     }
+    }
 }
