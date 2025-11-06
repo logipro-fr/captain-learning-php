@@ -1,11 +1,11 @@
-# Chatbot PHP
+# Captain Learning PHP
 
 Client PHP for Captain Learning API
 
 ## Install
 
 ```bash
-composer require logipro-fr/chatbot-php
+composer require logipro/captain-learning-php
 ```
 
 ## Usage
@@ -15,9 +15,9 @@ composer require logipro-fr/chatbot-php
 Disposer d'une clé API et d'un ID de clé API valides
 Configurer l'URL de base pour se connecter à l'API Captain Learning
 ```php
-$apiKeyId = "cl_apk_690b25d814d2b";
-$apiKey = "sk_7a5f1b27ad33f4b6455ce8f96ca90bf20c5bde61f6c3462918ae9bfb4c768c77";
-$url = 'http://172.17.0.1:11780';
+$apiKeyId = "cl_apk_690b25988d814d2b";
+$apiKey = "sk_7a5f1b27ad33f4b6455ce8f96ca90bf2";
+$url = 'http:monsite.fr';
 ```
 
 ### 2. Faire une instance du client
