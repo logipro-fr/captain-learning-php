@@ -5,24 +5,27 @@ namespace CaptainLearningPhp\Services\Formation;
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
 use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
-use CaptainLearningPhp\Exceptions\FormationBadRequestException;
-use Exception;
+use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Throwable;
 
 class FormationService
 {
     private HttpClientInterface $httpClient;
     private ApiUrls $apiUrls;
+    private string $token;
 
     public function __construct(
         HttpClientInterface $httpClient,
-        ApiUrls $apiUrls
+        ApiUrls $apiUrls,
+        string $token
     ) {
         $this->httpClient = $httpClient;
         $this->apiUrls = $apiUrls;
+        $this->token = $token;
     }
 
     public function create(FormationCreateRequest $formation): FormationCreateResponse
@@ -46,11 +49,12 @@ class FormationService
             $response = $this->httpClient->request('POST', $this->apiUrls->createFormation(), [
                 'headers' => [
                     'Accept' => 'application/json',
-                    'User-Agent' => 'CaptainLearningClient/1.0'
+                    'User-Agent' => 'CaptainLearningClient/1.0',
+                    'Authorization' => 'Bearer ' . $this->token
                 ] + $formData->getPreparedHeaders()->toArray(),
                 'body' => $formData->bodyToIterable()
             ]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             throw new FormationBadRequestException('Network error: ' . $e->getMessage());
         }
 

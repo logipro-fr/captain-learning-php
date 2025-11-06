@@ -8,20 +8,28 @@ use CaptainLearningPhp\CaptainLearningClientFactory;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
 use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class CaptainLearningClientTest extends TestCase
 {
     protected CaptainLearningClient $client;
     /** @var non-empty-string */
     protected string $codeFormation;
+    protected string $apiKey;
+    protected string $apiKeyId;
+
 
     protected function setUp(): void
     {
+        $this->codeFormation = "123";
+        $this->apiKeyId = 'cl_apk_123';
+        $this->apiKey = 'sk_example_secret';
         $captainLearningClientFactory = new CaptainLearningClientFactory();
         $this->client = $captainLearningClientFactory->createMockCaptainLearning();
-        $this->codeFormation = "123";
     }
+
     public function testCreateFormation(): void
     {
         // Arrange
@@ -74,11 +82,28 @@ class CaptainLearningClientTest extends TestCase
             ->onlyMethods(['request','stream'])
             ->getMock();
 
+        // Ajoute un mock de ResponseInterface
+        $responseMock = $this->createMock(ResponseInterface::class);
+        $responseMock->method('getContent')
+            ->willReturn('{
+                            "success": true,
+                            "data": {
+                                "token": "mock.token.value",
+                                "apiKeyId": "cl_apk_123"
+                            },
+                            "error": "",
+                            "error_message": ""
+                        }');
+
+        // Configure le mock pour retourner la réponse
+        $httpClientMock->method('request')
+            ->willReturn($responseMock);
+
         $customApiUrls = $this->getMockBuilder(ApiUrls::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $client = new CaptainLearningClient($httpClientMock, $customApiUrls);
+        $client = new CaptainLearningClient($this->apiKeyId, $this->apiKey, $httpClientMock, $customApiUrls);
 
         // Utilise Reflection pour accéder à la propriété privée
         $reflection = new \ReflectionClass($client);

@@ -28,4 +28,11 @@ class ApiUrlsTest extends TestCase
             (new ApiUrls())->createFormation()
         );
     }
+    public function testCreateTokenUri(): void
+    {
+        $this->assertSame(
+            ApiUrls::BASE_URL_PROD . ApiUrls::CREATE_TOKEN,
+            (new ApiUrls())->createToken()
+        );
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Exceptions;
 
-use CaptainLearningPhp\Exceptions\FormationBadRequestException;
+use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use PHPUnit\Framework\TestCase;
 
 class FormationBadRequestExceptionTest extends TestCase
