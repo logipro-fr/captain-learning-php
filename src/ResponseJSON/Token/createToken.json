@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "data": {
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NjIzNTYyNTIsImV4cCI6MTc2MjM1OTg1Miwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImFwaUtleUlkIjoiY2xfYXBrXzY5MGIyNWQ4MTRkMmIiLCJ1c2VybmFtZSI6ImNsX2Fwa182OTBiMjVkODE0ZDJiIn0.JC77yPIUVBL7rTT-iNDWioIQa0KJxJ73fenHODe4N3XnLj4mZQcAgxxGMWqwRCKEdiWDx1fsrsteY3YxIwTRaL5llJki5a1RjB5FebhN9yvJ7DPNNVbBoI_sxCQDCmfcJ4csuXgJKocP6GnpPUkwGJUa1WWgQ3zvy2esH5UkoBbSqxo8gf0QV-mCL9au8sLGmAK95PccycZeYr8VwwAirYP5rWPdoz8mhIQTZQuDkdCpWJzybC2kkWu9STfuRgYyVGEF4TmNL3inAENUNJTeS7-KQvmv6SCulsKwiUzFE8PknMIWdMyRGOBJC2OOphAGShoUNTaNeNIxQyiom7tWlQ",
+    "apiKeyId": "cl_apk_690b25d814d2b"
+  },
+  "error": "",
+  "error_message": ""
+}

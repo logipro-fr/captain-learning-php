@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Unit\Services;
+namespace Tests\Unit\Services\Formation;
 
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
 use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
-use CaptainLearningPhp\Exceptions\FormationBadRequestException;
+use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use CaptainLearningPhp\Services\Formation\FormationService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -39,7 +39,8 @@ class FormationServiceTest extends TestCase
 
         $sut = new FormationService(
             $httpClientMock,
-            $apiUrls
+            $apiUrls,
+            'sk_test_token'
         );
         // Act
         $formationCreateDTO = new FormationCreateRequest('Test Formation', 'CODE123');
@@ -82,14 +83,15 @@ class FormationServiceTest extends TestCase
 
         $sut = new FormationService(
             $httpClientMock,
-            $apiUrls
+            $apiUrls,
+            'sk_test_token'
         );
         // Act
 
         $this->expectException(FormationBadRequestException::class);
         $this->expectExceptionMessage('Bad request exception with content ');
 
-        $formationCreateDTO = new FormationCreateRequest('', ''); // Invalid data
+        $formationCreateDTO = new FormationCreateRequest('', '');
         $sut->create($formationCreateDTO);
     }
 
@@ -112,7 +114,8 @@ class FormationServiceTest extends TestCase
             )
             ->willThrowException(new FormationBadRequestException('Invalid formation data'));
 
-        $sut = new FormationService($httpClientMock, $apiUrls);
+
+        $sut = new FormationService($httpClientMock, $apiUrls, 'sk_test_token');
 
         // Act & Assert
         $this->expectException(FormationBadRequestException::class);

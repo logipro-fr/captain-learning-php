@@ -1,10 +1,10 @@
 <?php
 
-namespace CaptainLearningPhp\Exceptions;
+namespace CaptainLearningPhp\Exceptions\Token;
 
 use Exception;
 
-class FormationBadRequestException extends Exception
+class TokenBadRequestException extends Exception
 {
     public function __construct(string $message, int $code = 400)
     {

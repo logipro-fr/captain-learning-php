@@ -2,18 +2,54 @@
 
 Client PHP for Captain Learning API
 
-
-
 ## Install
+
+```bash
+composer require logipro/captain-learning-php
+```
+
+## Usage
+
+### 1. Initialisation
+
+Disposer d'une clé API et d'un ID de clé API valides
+Configurer l'URL de base pour se connecter à l'API Captain Learning
+```php
+$apiKeyId = "cl_apk_690b25988d814d2b";
+$apiKey = "sk_7a5f1b27ad33f4b6455ce8f96ca90bf2";
+$url = 'http:monsite.fr';
+```
+
+### 2. Faire une instance du client
+
+```php
+$client = new CaptainLearningClient(
+    $apiKeyId,
+    $apiKey,
+    $url
+);
+```
+
+### 3. Créer une formation
+
+```php
+$formation = new FormationCreateRequest(
+    'Nom de la formation',
+    'Id de la formation',
+    );
+
+$client->createFormation($formation);
+```
+
+## Contributing
+
+### Install
 
 ```bash
 git clone https://github.com/logipro-fr/captain-learning-php
 cd captain-learning-php
 ./install --profile devlocal
 ```
-
-## Contributing
-
 ### Requirements
 
 * docker
@@ -23,7 +59,7 @@ cd captain-learning-php
 
 To install locally or on a development server, be careful with the following environment variables:
 * DATA_PATH: path where data is stored; must be inside the project (default: ./data)
-* DATA_PATH_STORE: path for backups; generally outside the project (default: ../data/captain-learning-php)
+* DATA_PATH_STORE: path for backups; generally outside the project (default: ../data/chatbot-php)
 * REMOVE_DATABASE_WHEN_INSTALL: remove database during install (default: false)
 * BUILD_WHEN_INSTALL: build application during install (default: false)
 * DOCKER_DEV: run development-specific containers (default: false)
@@ -40,7 +76,7 @@ DATA_PATH=./data
 REMOVE_DATABASE_WHEN_INSTALL=true
 BUILD_WHEN_INSTALL=true
 DOCKER_DEV=true
-OPTIONAL_VOLUME=.:/var/captain-learning-php
+OPTIONAL_VOLUME=.:/var/chatbot-php
 LOCALDEV_WORKING_DIR=true
 URL_API=http://nginx
 PULL_POLICY=never

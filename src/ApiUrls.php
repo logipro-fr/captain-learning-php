@@ -30,6 +30,8 @@ class ApiUrls
 
     public const CREATE_FORMATION = self::PREFIX_API . '/v1/formation';
 
+    public const CREATE_TOKEN = self::PREFIX_API . '/v1/token';
+
     private string $baseUrl = self::BASE_URL_PROD;
 
     public function __construct(?string $baseUrl = null)
@@ -54,5 +56,10 @@ class ApiUrls
     public function createFormation(): string
     {
         return $this->getBaseUrl() . self::CREATE_FORMATION;
+    }
+
+    public function createToken(): string
+    {
+        return $this->getBaseUrl() . self::CREATE_TOKEN;
     }
 }

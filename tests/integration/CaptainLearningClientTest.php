@@ -5,7 +5,7 @@ namespace Tests\Integration;
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
-use CaptainLearningPhp\Exceptions\FormationBadRequestException;
+use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Tests\Unit\CaptainLearningClientTest as UnitCaptainLearningClientTest;
 
@@ -29,9 +29,12 @@ class CaptainLearningClientTest extends UnitCaptainLearningClientTest
             );
         }
         fclose($connection);
+        $this->apiKey = "sk_7a5f1b27ad33f4b6455ce8f96ca90bf20c5bde61f6c3462918ae9bfb4c768c77";
+        $this->apiKeyId = "cl_apk_690b25d814d2b";
         $this->client = new CaptainLearningClient(
-            new CurlHttpClient(),
-            new ApiUrls(self::BASE_URL)
+            $this->apiKeyId,
+            $this->apiKey,
+            self::BASE_URL
         );
         $this->codeFormation = uniqid();
     }
