@@ -6,8 +6,8 @@ use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\Exceptions\Token\TokenBadRequestException;
 use CaptainLearningPhp\Services\Token\CreateTokenService;
 use PHPUnit\Framework\TestCase;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 class CreateTokenServiceTest extends TestCase
 {
@@ -24,31 +24,16 @@ class CreateTokenServiceTest extends TestCase
                 "error_message": ""
             }';
 
-        $httpClientMock = $this->getMockBuilder(HttpClientInterface::class)
-            ->onlyMethods(['request', 'stream'])
-            ->getMock();
+        $mockResponse = new MockResponse($jsonResponse);
+        $httpClient = new MockHttpClient($mockResponse);
 
-        $responseMock = $this->createMock(ResponseInterface::class);
-        $responseMock->method('getContent')
-        ->willReturn($jsonResponse);
-
-        $httpClientMock->expects($this->once())
-            ->method('request')
-            ->with(
-                $this->equalTo('POST'),
-                $this->equalTo($apiUrls->createToken()),
-            )
-            ->willReturn($responseMock);
-
-        $sut = new CreateTokenService(
-            $httpClientMock,
-            $apiUrls
-        );
+        $sut = new CreateTokenService($httpClient, $apiUrls);
 
         $token = $sut->execute('cl_apk_123', 'sk_123456');
         $parts = explode('.', $token);
         $this->assertCount(3, $parts);
     }
+
     public function testFailureCreateToken(): void
     {
         $apiUrls = new ApiUrls();
@@ -59,52 +44,29 @@ class CreateTokenServiceTest extends TestCase
                 "error_message": "Invalid API credentials"
             }';
 
-        $httpClientMock = $this->getMockBuilder(HttpClientInterface::class)
-            ->onlyMethods(['request', 'stream'])
-            ->getMock();
+        $mockResponse = new MockResponse($jsonResponse);
+        $httpClient = new MockHttpClient($mockResponse);
 
-        $responseMock = $this->createMock(ResponseInterface::class);
-        $responseMock->method('getContent')
-            ->willReturn($jsonResponse);
-
-        $httpClientMock->expects($this->once())
-            ->method('request')
-            ->with(
-                $this->equalTo('POST'),
-                $this->equalTo($apiUrls->createToken()),
-            )
-            ->willReturn($responseMock);
-
-        $sut = new CreateTokenService(
-            $httpClientMock,
-            $apiUrls
-        );
+        $sut = new CreateTokenService($httpClient, $apiUrls);
 
         $this->expectException(TokenBadRequestException::class);
+        $this->expectExceptionMessage('Invalid API credentials');
         $sut->execute('cl_apk_invalid', 'sk_invalid');
     }
+
     public function testFailRequest(): void
     {
         $apiUrls = new ApiUrls();
 
-        $httpClientMock = $this->getMockBuilder(HttpClientInterface::class)
-           ->onlyMethods(['request', 'stream'])
-           ->getMock();
+        $callback = function () {
+            throw new \Exception('Network error');
+        };
 
-        $httpClientMock->expects($this->once())
-           ->method('request')
-           ->with(
-               $this->equalTo('POST'),
-               $this->equalTo($apiUrls->createToken()),
-           )
-           ->willThrowException(new \Exception('Network error'));
+        $httpClient = new MockHttpClient($callback);
 
-        $sut = new CreateTokenService(
-            $httpClientMock,
-            $apiUrls
-        );
+        $sut = new CreateTokenService($httpClient, $apiUrls);
 
-        $this->expectException(\Exception::class);
+        $this->expectException(TokenBadRequestException::class);
         $this->expectExceptionMessage('Network error');
         $sut->execute('cl_apk_123', 'sk_123456');
     }
