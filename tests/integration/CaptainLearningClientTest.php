@@ -34,8 +34,7 @@ class CaptainLearningClientTest extends UnitCaptainLearningClientTest
         $this->client = new CaptainLearningClient(
             $this->apiKeyId,
             $this->apiKey,
-            new CurlHttpClient(),
-            new ApiUrls(self::BASE_URL)
+            self::BASE_URL
         );
         $this->codeFormation = uniqid();
     }

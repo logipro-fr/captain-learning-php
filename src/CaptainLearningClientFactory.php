@@ -18,7 +18,7 @@ class CaptainLearningClientFactory
         $callable = function (string $method, string $url, array $options): MockResponse {
             return $this->callableResponse($method, $url, $options);
         };
-        return new CaptainLearningClient('cl_apk_123', 'sk_example_secret', new MockHttpClient($callable));
+        return new CaptainLearningClient('cl_apk_123', 'sk_example_secret', null, new MockHttpClient($callable));
     }
     /**
      * @param array<mixed, mixed> $options

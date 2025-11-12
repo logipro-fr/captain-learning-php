@@ -99,17 +99,19 @@ class CaptainLearningClientTest extends TestCase
         $httpClientMock->method('request')
             ->willReturn($responseMock);
 
-        $customApiUrls = $this->getMockBuilder(ApiUrls::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        // $customApiUrls = $this->getMockBuilder(ApiUrls::class)
+        //     ->disableOriginalConstructor()
+        //     ->getMock();
+        $customApiUrls = 'https://custom.api.url';
 
-        $client = new CaptainLearningClient($this->apiKeyId, $this->apiKey, $httpClientMock, $customApiUrls);
+
+        $client = new CaptainLearningClient($this->apiKeyId, $this->apiKey, $customApiUrls, $httpClientMock);
 
         // Utilise Reflection pour accéder à la propriété privée
         $reflection = new \ReflectionClass($client);
         $property = $reflection->getProperty('apiUrls');
         $property->setAccessible(true);
 
-        $this->assertSame($customApiUrls, $property->getValue($client));
+        $this->assertEquals(new ApiUrls($customApiUrls), $property->getValue($client));
     }
 }

@@ -26,8 +26,7 @@ $url = 'http:monsite.fr';
 $client = new CaptainLearningClient(
     $apiKeyId,
     $apiKey,
-    new CurlHttpClient(),
-    new ApiUrls($url)
+    $url
 );
 ```
 

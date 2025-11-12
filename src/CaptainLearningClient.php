@@ -19,11 +19,15 @@ class CaptainLearningClient implements CaptainLearningClientInterface
     public function __construct(
         string $apiKeyId,
         string $apiKey,
-        ?HttpClientInterface $httpClient = null,
-        ?ApiUrls $apiUrls = null
+        ?string $apiUrls = null,
+        ?HttpClientInterface $httpClient = null
     ) {
         $this->httpClient = $httpClient ?? new CurlHttpClient();
-        $this->apiUrls = $apiUrls ?? new  ApiUrls();
+        if (is_string($apiUrls)) {
+            $this->apiUrls = new ApiUrls($apiUrls);
+        } else {
+            $this->apiUrls = new ApiUrls();
+        }
         $this->token = $this->requestToken($apiKeyId, $apiKey);
         $this->formationService = new FormationService($this->httpClient, $this->apiUrls, $this->token);
     }
