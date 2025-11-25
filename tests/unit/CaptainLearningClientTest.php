@@ -19,6 +19,8 @@ class CaptainLearningClientTest extends TestCase
     protected string $codeFormation;
     protected string $apiKey;
     protected string $apiKeyId;
+    protected string $apiUrls;
+    protected string $tenantId;
 
 
     protected function setUp(): void
@@ -26,6 +28,8 @@ class CaptainLearningClientTest extends TestCase
         $this->codeFormation = "123";
         $this->apiKeyId = 'cl_apk_123';
         $this->apiKey = 'sk_example_secret';
+        $this->tenantId = 'demo_tenant';
+        $this->apiUrls = 'https://api.captainlearning.com';
         $captainLearningClientFactory = new CaptainLearningClientFactory();
         $this->client = $captainLearningClientFactory->createMockCaptainLearning();
     }
@@ -35,9 +39,8 @@ class CaptainLearningClientTest extends TestCase
         // Arrange
         $getFile = new GetFile();
         $file = $getFile->buildUploadedFile();
-        $nameFormation = "Formation de test";
+        $nameFormation = "Formation de test avec tenant_id";
         $formation = new FormationCreateRequest($nameFormation, $this->codeFormation, $file);
-
 
         // Act
         $responseCreateDTO = $this->client->createFormation($formation);
@@ -99,19 +102,20 @@ class CaptainLearningClientTest extends TestCase
         $httpClientMock->method('request')
             ->willReturn($responseMock);
 
-        // $customApiUrls = $this->getMockBuilder(ApiUrls::class)
-        //     ->disableOriginalConstructor()
-        //     ->getMock();
-        $customApiUrls = 'https://custom.api.url';
 
-
-        $client = new CaptainLearningClient($this->apiKeyId, $this->apiKey, $customApiUrls, $httpClientMock);
+        $client = new CaptainLearningClient(
+            $this->apiKeyId,
+            $this->apiKey,
+            $this->apiUrls,
+            $this->tenantId,
+            $httpClientMock
+        );
 
         // Utilise Reflection pour accéder à la propriété privée
         $reflection = new \ReflectionClass($client);
         $property = $reflection->getProperty('apiUrls');
         $property->setAccessible(true);
 
-        $this->assertEquals(new ApiUrls($customApiUrls), $property->getValue($client));
+        $this->assertEquals(new ApiUrls($this->apiUrls, $this->tenantId), $property->getValue($client));
     }
 }

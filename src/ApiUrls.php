@@ -32,12 +32,19 @@ class ApiUrls
 
     public const CREATE_TOKEN = self::PREFIX_API . '/v1/token';
 
+    public const PARAM_TENANT_ID = '?tenant_id=';
+
     private string $baseUrl = self::BASE_URL_PROD;
 
-    public function __construct(?string $baseUrl = null)
+    private string $paramTenantId = '';
+
+    public function __construct(?string $baseUrl = null, ?string $tenantId = null)
     {
         if ($baseUrl !== null) {
             $this->baseUrl = $baseUrl;
+        }
+        if ($tenantId !== null) {
+            $this->paramTenantId = self::PARAM_TENANT_ID . $tenantId;
         }
     }
     /**
@@ -55,11 +62,11 @@ class ApiUrls
      */
     public function createFormation(): string
     {
-        return $this->getBaseUrl() . self::CREATE_FORMATION;
+        return $this->getBaseUrl() . self::CREATE_FORMATION . $this->paramTenantId;
     }
 
     public function createToken(): string
     {
-        return $this->getBaseUrl() . self::CREATE_TOKEN;
+        return $this->getBaseUrl() . self::CREATE_TOKEN . $this->paramTenantId;
     }
 }
