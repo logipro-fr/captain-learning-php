@@ -18,6 +18,7 @@ Configurer l'URL de base pour se connecter à l'API Captain Learning
 $apiKeyId = "cl_apk_690b25988d814d2b";
 $apiKey = "sk_7a5f1b27ad33f4b6455ce8f96ca90bf2";
 $url = 'http:monsite.fr';
+$tenantId = "mon_tenantId"
 ```
 
 ### 2. Faire une instance du client
@@ -26,7 +27,8 @@ $url = 'http:monsite.fr';
 $client = new CaptainLearningClient(
     $apiKeyId,
     $apiKey,
-    $url
+    $url,
+    $tenantId
 );
 ```
 

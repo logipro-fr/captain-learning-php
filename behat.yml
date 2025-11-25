@@ -10,7 +10,7 @@ default:
       paths:
         - '%paths.base%/features/'
       contexts:
-        - Tests\Features\BasicBehatScenarioContext
+        - Tests\Features\ConnexionCaptainLearningContext
 #  extensions:
 #    DVDoug\Behat\CodeCoverage\Extension:
 #      filter:

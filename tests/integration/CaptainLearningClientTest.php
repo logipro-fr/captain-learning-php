@@ -2,11 +2,9 @@
 
 namespace Tests\Integration;
 
-use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
 use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
-use Symfony\Component\HttpClient\CurlHttpClient;
 use Tests\Unit\CaptainLearningClientTest as UnitCaptainLearningClientTest;
 
 class CaptainLearningClientTest extends UnitCaptainLearningClientTest
@@ -29,14 +27,39 @@ class CaptainLearningClientTest extends UnitCaptainLearningClientTest
             );
         }
         fclose($connection);
-        $this->apiKey = "sk_7a5f1b27ad33f4b6455ce8f96ca90bf20c5bde61f6c3462918ae9bfb4c768c77";
-        $this->apiKeyId = "cl_apk_690b25d814d2b";
+
+
+        // dev demo
+        // $this->apiKey = "sk_28f9dddd4a00d78c4bdc0f94a6c3f5428bc82dae4d4b7ba920b94c1cad29a6e9";
+        // $this->apiKeyId = "cl_apk_6924772ee80be";
+        // $this->tenantId = $this->getTenantId('demo');
+        // $this->apiUrls = 'https://dev.captain-learning.com';
+
+        // tenant_id = demo
+        $this->apiKey = "sk_24b3749d68a3c63e5106807c573ee904bee93ae4355ddd016fb0485676652666";
+        $this->apiKeyId = "cl_apk_6924259755514";
+        $this->tenantId = $this->getTenantId('demo');
+
+        // Sans tenant_id
+        // $this->apiKey = "sk_50f27e157605f99ecf721f53372fee62d18dbfc397dcc15236195a63ff47ac9a";
+        // $this->apiKeyId = "cl_apk_692432299fb86";
+        // $this->tenantId = $this->getTenantId('');
+
+
+        $this->apiUrls = self::BASE_URL;
+
         $this->client = new CaptainLearningClient(
             $this->apiKeyId,
             $this->apiKey,
-            self::BASE_URL
+            $this->apiUrls,
+            $this->tenantId == '' ? null : $this->tenantId
         );
         $this->codeFormation = uniqid();
+    }
+
+    private function getTenantId(string $tenantId): string
+    {
+        return $tenantId;
     }
 
     public function testCreateFormationThrowsFormationBadRequestException(): void

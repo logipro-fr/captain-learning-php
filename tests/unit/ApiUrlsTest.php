@@ -35,4 +35,15 @@ class ApiUrlsTest extends TestCase
             (new ApiUrls())->createToken()
         );
     }
+    public function testNewBaseUrlWithTenantId(): void
+    {
+        $newBaseUrl = "http://nginx";
+        $tenantId = "test_tenant";
+        $apiUrls = new ApiUrls($newBaseUrl, $tenantId);
+        $this->assertSame($newBaseUrl, $apiUrls->getBaseUrl());
+        $this->assertSame(
+            $newBaseUrl . ApiUrls::CREATE_FORMATION . ApiUrls::PARAM_TENANT_ID . $tenantId,
+            $apiUrls->createFormation()
+        );
+    }
 }
