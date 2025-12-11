@@ -1,0 +1,6 @@
+{
+    "success": false,
+    "data": null,
+    "error": "CaptainLearning\\Domain\\Model\\Formation\\Exceptions\\FormationNotFoundException",
+    "error_message": "Formation with Id invalid_code not found"
+}

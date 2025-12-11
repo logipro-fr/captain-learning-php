@@ -30,6 +30,8 @@ class ApiUrls
 
     public const CREATE_FORMATION = self::PREFIX_API . '/v1/formation';
 
+    public const UPDATE_FORMATION = self::PREFIX_API . '/v1/formation';
+
     public const CREATE_TOKEN = self::PREFIX_API . '/v1/token';
 
     public const PARAM_TENANT_ID = '?tenant_id=';
@@ -63,6 +65,11 @@ class ApiUrls
     public function createFormation(): string
     {
         return $this->getBaseUrl() . self::CREATE_FORMATION . $this->paramTenantId;
+    }
+
+    public function updateFormation(string $code): string
+    {
+        return $this->getBaseUrl() . self::UPDATE_FORMATION . '/' . $code . $this->paramTenantId;
     }
 
     public function createToken(): string

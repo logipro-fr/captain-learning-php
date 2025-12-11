@@ -44,4 +44,9 @@ class CaptainLearningClient implements CaptainLearningClientInterface
     {
         return $this->formationService->create($formation);
     }
+
+    public function updateFormation(FormationCreateRequest $formation): FormationCreateResponse
+    {
+        return $this->formationService->update($formation);
+    }
 }

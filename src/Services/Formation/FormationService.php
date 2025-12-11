@@ -67,6 +67,32 @@ class FormationService
         return $result;
     }
 
+    public function update(FormationCreateRequest $formation): FormationCreateResponse
+    {
+        $content = [
+            'intituleFormation' => $formation->intituleFormation,
+        ];
+
+        try {
+            $response = $this->httpClient->request('PATCH', $this->apiUrls->updateFormation($formation->code), [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'User-Agent' => 'CaptainLearningClient/1.0',
+                    'Authorization' => 'Bearer ' . $this->token
+                ],
+                'json' => $content
+            ]);
+        } catch (Throwable $e) {
+            throw new FormationBadRequestException('Network error: ' . $e->getMessage());
+        }
+        $result = $this->getFormationCreateResponse($response);
+        if (!$result->success) {
+            throw new FormationBadRequestException($result->error_message);
+        }
+
+        return $result;
+    }
 
     private function getFormationCreateResponse(ResponseInterface $response): FormationCreateResponse
     {

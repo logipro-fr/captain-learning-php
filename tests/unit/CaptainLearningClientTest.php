@@ -7,6 +7,7 @@ use CaptainLearningPhp\CaptainLearningClient;
 use CaptainLearningPhp\CaptainLearningClientFactory;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
 use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
+use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -117,5 +118,37 @@ class CaptainLearningClientTest extends TestCase
         $property->setAccessible(true);
 
         $this->assertEquals(new ApiUrls($this->apiUrls, $this->tenantId), $property->getValue($client));
+    }
+
+    public function testUpdateFormation(): void
+    {
+        //arrange
+        $nameFormation = "Formation de test sans fichier";
+        $code = $this->codeFormation;
+        $formation = new FormationCreateRequest($nameFormation, $code);
+
+        $this->client->createFormation($formation);
+
+        $newNameFormation = "Formation de test update";
+        $formationUpdate = new FormationCreateRequest($newNameFormation, $code);
+
+        //act
+        $responseUpdateDTO = $this->client->updateFormation($formationUpdate);
+
+        //assert
+        $this->assertInstanceOf(FormationCreateResponse::class, $responseUpdateDTO);
+        $this->assertTrue($responseUpdateDTO->success);
+        $this->assertTrue($responseUpdateDTO->data !== null);
+    }
+
+    public function testFailUpdateFormation(): void
+    {
+        //arrange
+        $nameFormation = "Formation de test sans fichier";
+        $formation = new FormationCreateRequest($nameFormation, 'invalid_code');
+
+        //assert & act
+        $this->expectException(FormationBadRequestException::class);
+        $this->client->updateFormation($formation);
     }
 }
