@@ -4,7 +4,9 @@ namespace CaptainLearningPhp\Services\Formation;
 
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
-use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
+use CaptainLearningPhp\DTO\Formation\FormationGetRequest;
+use CaptainLearningPhp\DTO\Formation\FormationResponse;
+use CaptainLearningPhp\DTO\Formation\FormationUpdateRequest;
 use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -28,7 +30,7 @@ class FormationService
         $this->token = $token;
     }
 
-    public function create(FormationCreateRequest $formation): FormationCreateResponse
+    public function create(FormationCreateRequest $formation): FormationResponse
     {
         $body = [
         'intituleFormation' => $formation->intituleFormation,
@@ -58,7 +60,7 @@ class FormationService
             throw new FormationBadRequestException('Network error: ' . $e->getMessage());
         }
 
-        $result = $this->getFormationCreateResponse($response);
+        $result = $this->getFormationResponse($response);
 
         if (!$result->success) {
             throw new FormationBadRequestException($result->error_message);
@@ -67,7 +69,7 @@ class FormationService
         return $result;
     }
 
-    public function update(FormationCreateRequest $formation): FormationCreateResponse
+    public function update(FormationUpdateRequest $formation): FormationResponse
     {
         $content = [
             'intituleFormation' => $formation->intituleFormation,
@@ -86,7 +88,7 @@ class FormationService
         } catch (Throwable $e) {
             throw new FormationBadRequestException('Network error: ' . $e->getMessage());
         }
-        $result = $this->getFormationCreateResponse($response);
+        $result = $this->getFormationResponse($response);
         if (!$result->success) {
             throw new FormationBadRequestException($result->error_message);
         }
@@ -94,7 +96,31 @@ class FormationService
         return $result;
     }
 
-    private function getFormationCreateResponse(ResponseInterface $response): FormationCreateResponse
+    public function get(FormationGetRequest $formationGetRequest): FormationResponse
+    {
+        try {
+            $response = $this->httpClient->request(
+                'GET',
+                $this->apiUrls->getFormation($formationGetRequest->codeFormation),
+                [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'CaptainLearningClient/1.0',
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+                ]
+            );
+        } catch (Throwable $e) {
+            throw new FormationBadRequestException('Network error: ' . $e->getMessage());
+        }
+        $result = $this->getFormationResponse($response);
+        if (!$result->success) {
+            throw new FormationBadRequestException($result->error_message);
+        }
+
+        return $result;
+    }
+    private function getFormationResponse(ResponseInterface $response): FormationResponse
     {
         /**
          * @var array{
@@ -105,7 +131,7 @@ class FormationService
          * } $responseData
          */
         $responseData = json_decode($response->getContent(false), true);
-        $result = new FormationCreateResponse(
+        $result = new FormationResponse(
             $responseData['success'],
             $responseData['data'],
             $responseData['error'],

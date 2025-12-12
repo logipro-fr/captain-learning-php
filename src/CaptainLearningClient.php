@@ -3,7 +3,9 @@
 namespace CaptainLearningPhp;
 
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
-use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
+use CaptainLearningPhp\DTO\Formation\FormationGetRequest;
+use CaptainLearningPhp\DTO\Formation\FormationResponse;
+use CaptainLearningPhp\DTO\Formation\FormationUpdateRequest;
 use CaptainLearningPhp\Services\Formation\FormationService;
 use CaptainLearningPhp\Services\Token\CreateTokenService;
 use Symfony\Component\HttpClient\CurlHttpClient;
@@ -40,13 +42,18 @@ class CaptainLearningClient implements CaptainLearningClientInterface
         return $response;
     }
 
-    public function createFormation(FormationCreateRequest $formation): FormationCreateResponse
+    public function createFormation(FormationCreateRequest $formation): FormationResponse
     {
         return $this->formationService->create($formation);
     }
 
-    public function updateFormation(FormationCreateRequest $formation): FormationCreateResponse
+    public function updateFormation(FormationUpdateRequest $formation): FormationResponse
     {
         return $this->formationService->update($formation);
+    }
+
+    public function getFormation(FormationGetRequest $codeFormation): FormationResponse
+    {
+        return $this->formationService->get($codeFormation);
     }
 }

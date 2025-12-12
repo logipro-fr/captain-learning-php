@@ -12,6 +12,7 @@ use function Safe\file_get_contents;
 class CaptainLearningClientFactory
 {
     private const RESPONSE_JSON_PATH = '/src/ResponseJSON';
+    public const ID_NOT_FOUND = "DoNotExist";
 
     public function createMockCaptainLearning(): CaptainLearningClient
     {
@@ -28,14 +29,11 @@ class CaptainLearningClientFactory
         if ($method == 'POST' && str_ends_with($url, '/v1/formation')) {
             return $this->postV1FormationMockResponse();
         }
+        if ($method == 'GET' && str_contains($url, '/v1/formation')) {
+            return $this->getV1FormationMockResponse($url);
+        }
         if ($method == 'PATCH' && str_contains($url, '/v1/formation')) {
-            $urlParts = explode('/', $url);
-            $formationCode = end($urlParts);
-            if (!empty($formationCode) && $formationCode !== 'invalid_code') {
-                return $this->updateV1FormationMockResponse();
-            } else {
-                return $this->updateV1FormationNotFoundMockResponse();
-            }
+                return $this->updateV1FormationMockResponse($url);
         }
         if ($method == 'POST' && str_ends_with($url, '/v1/token')) {
             return $this->postV1TokenMockResponse();
@@ -60,21 +58,35 @@ class CaptainLearningClientFactory
         $response = $this->readResponseJson('/Token/createToken.json');
         return new MockResponse($response);
     }
-    private function updateV1FormationMockResponse(): MockResponse
+    private function updateV1FormationMockResponse(string $url): MockResponse
     {
+        if ($this->isNotFoundRequest($url)) {
+            return $this->updateV1FormationNotFoundMockResponse();
+        }
         $response = $this->readResponseJson('/Formation/updateFormation.json');
         return new MockResponse($response);
     }
     private function updateV1FormationNotFoundMockResponse(): MockResponse
     {
         $response = $this->readResponseJson('/Formation/failUpdateFormation.json');
-
-        // $response = '{
-        //     "success": false,
-        //     "data": null,
-        //     "error": "CaptainLearning\Domain\Model\Formation\Exceptions\FormationNotFoundException",
-        //     "error_message": "Formation with Id invalid_code not found"
-        // }';
         return new MockResponse($response);
+    }
+    private function getV1FormationMockResponse(string $url): MockResponse
+    {
+        if ($this->isNotFoundRequest($url)) {
+            return $this->getV1FormationFailMockResponse();
+        }
+        $response = $this->readResponseJson('/Formation/getFormation.json');
+        return new MockResponse($response);
+    }
+    private function getV1FormationFailMockResponse(): MockResponse
+    {
+        $response = $this->readResponseJson('/Formation/failGetFormation.json');
+        return new MockResponse($response);
+    }
+
+    private function isNotFoundRequest(string $url): bool
+    {
+        return str_contains($url, self::ID_NOT_FOUND);
     }
 }

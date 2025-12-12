@@ -6,10 +6,15 @@ use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\CaptainLearningClient;
 use CaptainLearningPhp\CaptainLearningClientFactory;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
-use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
+use CaptainLearningPhp\DTO\Formation\FormationGetRequest;
+use CaptainLearningPhp\DTO\Formation\FormationResponse;
+use CaptainLearningPhp\DTO\Formation\FormationUpdateRequest;
 use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -47,7 +52,7 @@ class CaptainLearningClientTest extends TestCase
         $responseCreateDTO = $this->client->createFormation($formation);
 
         // Assert
-        $this->assertInstanceOf(FormationCreateResponse::class, $responseCreateDTO);
+        $this->assertInstanceOf(FormationResponse::class, $responseCreateDTO);
         $this->assertTrue($responseCreateDTO->success);
         $this->assertTrue($responseCreateDTO->data !== null);
 
@@ -68,7 +73,7 @@ class CaptainLearningClientTest extends TestCase
 
         $responseCreateDTO = $this->client->createFormation($formation);
         // Assert
-        $this->assertInstanceOf(FormationCreateResponse::class, $responseCreateDTO);
+        $this->assertInstanceOf(FormationResponse::class, $responseCreateDTO);
         $this->assertTrue($responseCreateDTO->success);
         $this->assertTrue($responseCreateDTO->data !== null);
         $this->assertArrayHasKey('formationId', $responseCreateDTO->data);
@@ -130,13 +135,13 @@ class CaptainLearningClientTest extends TestCase
         $this->client->createFormation($formation);
 
         $newNameFormation = "Formation de test update";
-        $formationUpdate = new FormationCreateRequest($newNameFormation, $code);
+        $formationUpdate = new FormationUpdateRequest($newNameFormation, $code);
 
         //act
         $responseUpdateDTO = $this->client->updateFormation($formationUpdate);
 
         //assert
-        $this->assertInstanceOf(FormationCreateResponse::class, $responseUpdateDTO);
+        $this->assertInstanceOf(FormationResponse::class, $responseUpdateDTO);
         $this->assertTrue($responseUpdateDTO->success);
         $this->assertTrue($responseUpdateDTO->data !== null);
     }
@@ -145,10 +150,86 @@ class CaptainLearningClientTest extends TestCase
     {
         //arrange
         $nameFormation = "Formation de test sans fichier";
-        $formation = new FormationCreateRequest($nameFormation, 'invalid_code');
+        $formation = new FormationUpdateRequest($nameFormation, CaptainLearningClientFactory::ID_NOT_FOUND);
 
         //assert & act
         $this->expectException(FormationBadRequestException::class);
         $this->client->updateFormation($formation);
+    }
+    public function testUpdateFormationThrowsExceptionOnNetworkError(): void
+    {
+        // Arrange
+        $nameFormation = "Formation de test sans fichier";
+        $formation = new FormationUpdateRequest($nameFormation, CaptainLearningClientFactory::ID_NOT_FOUND);
+
+        $client = $this->createMockClientThatThrowsOnRequest('PATCH');
+        // Assert & Act
+        $this->expectException(FormationBadRequestException::class);
+        // $this->expectExceptionMessage('Network error:');
+
+        $client->updateFormation($formation);
+    }
+    public function testGetFormation(): void
+    {
+        //arrange
+        $codeFormation = $this->codeFormation;
+        //act
+        $formationGetRequest = new FormationGetRequest($codeFormation);
+        $responseDTO = $this->client->getFormation($formationGetRequest);
+        //assert
+        $this->assertInstanceOf(FormationResponse::class, $responseDTO);
+        $this->assertTrue($responseDTO->success);
+    }
+
+    public function testFailGetFormation(): void
+    {
+        //arrange
+        $codeFormation = CaptainLearningClientFactory::ID_NOT_FOUND;
+        //assert & act
+        $this->expectException(FormationBadRequestException::class);
+
+        $formationGetRequest = new FormationGetRequest($codeFormation);
+        $this->client->getFormation($formationGetRequest);
+    }
+    public function testGetFormationThrowsExceptionOnNetworkError(): void
+    {
+        // Arrange
+
+        $client = $this->createMockClientThatThrowsOnRequest('GET');
+        // Assert & Act
+        $this->expectException(FormationBadRequestException::class);
+        $this->expectExceptionMessage('Network error:');
+        $formationGetRequest = new FormationGetRequest($this->codeFormation);
+        $client->getFormation($formationGetRequest);
+    }
+
+    private function createMockClientThatThrowsOnRequest(string $methodRequest): CaptainLearningClient
+    {
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use ($methodRequest) {
+            if ($method === 'POST' && str_ends_with($url, '/v1/token')) {
+                return new MockResponse('{
+                    "success": true,
+                    "data": {
+                        "token": "mock.token.value",
+                        "apiKeyId": "cl_apk_123"
+                    },
+                    "error": "",
+                    "error_message": ""
+                }');
+            }
+            if ($method === $methodRequest && str_contains($url, '/v1/formation')) {
+                throw new class extends \Exception implements TransportExceptionInterface {
+                };
+            }
+            return new MockResponse('{}');
+        });
+        $client = new CaptainLearningClient(
+            'cl_apk_123',
+            'sk_example_secret',
+            null,
+            null,
+            $mockClient
+        );
+        return $client;
     }
 }

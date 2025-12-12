@@ -4,7 +4,9 @@ namespace Tests\Integration;
 
 use CaptainLearningPhp\CaptainLearningClient;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
-use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
+use CaptainLearningPhp\DTO\Formation\FormationGetRequest;
+use CaptainLearningPhp\DTO\Formation\FormationResponse;
+use CaptainLearningPhp\DTO\Formation\FormationUpdateRequest;
 use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use Tests\Unit\CaptainLearningClientTest as UnitCaptainLearningClientTest;
 
@@ -81,14 +83,29 @@ class CaptainLearningClientTest extends UnitCaptainLearningClientTest
         $this->client->createFormation($formation);
 
         $newNameFormation = "Formation de test update";
-        $formationUpdate = new FormationCreateRequest($newNameFormation, 'cl_formation_' . $code);
+        $formationUpdate = new FormationUpdateRequest($newNameFormation, 'cl_formation_' . $code);
 
         //act
         $responseUpdateDTO = $this->client->updateFormation($formationUpdate);
 
         //assert
-        $this->assertInstanceOf(FormationCreateResponse::class, $responseUpdateDTO);
+        $this->assertInstanceOf(FormationResponse::class, $responseUpdateDTO);
         $this->assertTrue($responseUpdateDTO->success);
         $this->assertTrue($responseUpdateDTO->data !== null);
+    }
+    public function testGetFormation(): void
+    {
+           //arrange
+        $nameFormation = "Formation de test sans fichier";
+        $code = $this->codeFormation;
+        $formation = new FormationCreateRequest($nameFormation, $code);
+
+        $this->client->createFormation($formation);
+        //act
+        $formationGetRequest = new FormationGetRequest('cl_formation_' . $code);
+        $responseDTO = $this->client->getFormation($formationGetRequest);
+        //assert
+        $this->assertInstanceOf(FormationResponse::class, $responseDTO);
+        $this->assertTrue($responseDTO->success);
     }
 }

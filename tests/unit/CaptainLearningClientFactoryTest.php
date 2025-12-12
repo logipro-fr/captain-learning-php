@@ -38,7 +38,6 @@ class CaptainLearningClientFactoryTest extends TestCase
 
         $this->expectException(BadRequestException::class);
 
-        // Appel avec 'GET' au lieu de 'POST'
-        $method->invoke($factory, 'GET', '/api/external/v1/formation', []);
+        $method->invoke($factory, 'GET', '/api/external/v1/no_route_existing', []);
     }
 }
