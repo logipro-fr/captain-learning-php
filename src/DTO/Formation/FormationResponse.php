@@ -2,7 +2,7 @@
 
 namespace CaptainLearningPhp\DTO\Formation;
 
-class FormationCreateResponse
+class FormationResponse
 {
     public bool $success;
     /** @var array<string, mixed> | null */

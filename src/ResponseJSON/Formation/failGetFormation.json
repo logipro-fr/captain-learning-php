@@ -1,0 +1,6 @@
+{
+  "success": false,
+  "data": null,
+  "error": "CaptainLearning\\Domain\\Model\\Formation\\Exceptions\\FormationNotFoundException",
+  "error_message": "Formation with Id 'cl_formation_system_235235235235' not found"
+}

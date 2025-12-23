@@ -4,7 +4,7 @@ namespace Tests\Unit\Services\Formation;
 
 use CaptainLearningPhp\ApiUrls;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
-use CaptainLearningPhp\DTO\Formation\FormationCreateResponse;
+use CaptainLearningPhp\DTO\Formation\FormationResponse;
 use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use CaptainLearningPhp\Services\Formation\FormationService;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ class FormationServiceTest extends TestCase
     {
      // Arrange
         $apiUrls = new ApiUrls();
-        $responseExpected = new FormationCreateResponse(true, ['formationId' => 'cl_formation_123'], '', '');
+        $responseExpected = new FormationResponse(true, ['formationId' => 'cl_formation_123'], '', '');
         $jsonResponse = json_encode($responseExpected);
 
         $httpClientMock = $this->getMockBuilder(HttpClientInterface::class)
@@ -48,7 +48,7 @@ class FormationServiceTest extends TestCase
         $result = $sut->create($formationCreateDTO);
 
         // Assert
-        $this->assertInstanceOf(FormationCreateResponse::class, $result);
+        $this->assertInstanceOf(FormationResponse::class, $result);
         $this->assertTrue($result->success);
         $this->assertNotNull($result->data);
         $this->assertArrayHasKey('formationId', $result->data);
@@ -61,7 +61,7 @@ class FormationServiceTest extends TestCase
     {
      // Arrange
         $apiUrls = new ApiUrls();
-        $responseExpected = new FormationCreateResponse(false, [], 'ERR001', 'Invalid data');
+        $responseExpected = new FormationResponse(false, [], 'ERR001', 'Invalid data');
         $jsonResponse = json_encode($responseExpected);
 
         $httpClientMock = $this->getMockBuilder(HttpClientInterface::class)

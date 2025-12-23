@@ -4,6 +4,9 @@ namespace Tests\Integration;
 
 use CaptainLearningPhp\CaptainLearningClient;
 use CaptainLearningPhp\DTO\Formation\FormationCreateRequest;
+use CaptainLearningPhp\DTO\Formation\FormationGetRequest;
+use CaptainLearningPhp\DTO\Formation\FormationResponse;
+use CaptainLearningPhp\DTO\Formation\FormationUpdateRequest;
 use CaptainLearningPhp\Exceptions\Formation\FormationBadRequestException;
 use Tests\Unit\CaptainLearningClientTest as UnitCaptainLearningClientTest;
 
@@ -36,8 +39,8 @@ class CaptainLearningClientTest extends UnitCaptainLearningClientTest
         // $this->apiUrls = 'https://dev.captain-learning.com';
 
         // tenant_id = demo
-        $this->apiKey = "sk_24b3749d68a3c63e5106807c573ee904bee93ae4355ddd016fb0485676652666";
-        $this->apiKeyId = "cl_apk_6924259755514";
+        $this->apiKey = "sk_e7d1a0d1afc0feba66158536fbee1f02ba00a0c993bb4313359c306e958358b1";
+        $this->apiKeyId = "cl_apk_693a83860890d";
         $this->tenantId = $this->getTenantId('demo');
 
         // Sans tenant_id
@@ -54,7 +57,7 @@ class CaptainLearningClientTest extends UnitCaptainLearningClientTest
             $this->apiUrls,
             $this->tenantId == '' ? null : $this->tenantId
         );
-        $this->codeFormation = uniqid();
+        $this->codeFormation = 'system_' . uniqid();
     }
 
     private function getTenantId(string $tenantId): string
@@ -69,5 +72,40 @@ class CaptainLearningClientTest extends UnitCaptainLearningClientTest
         $formation = new FormationCreateRequest('test', '');
 
         $this->client->createFormation($formation);
+    }
+    public function testUpdateFormation(): void
+    {
+        //arrange
+        $nameFormation = "Formation de test sans fichier";
+        $code = $this->codeFormation;
+        $formation = new FormationCreateRequest($nameFormation, $code);
+
+        $this->client->createFormation($formation);
+
+        $newNameFormation = "Formation de test update";
+        $formationUpdate = new FormationUpdateRequest($newNameFormation, 'cl_formation_' . $code);
+
+        //act
+        $responseUpdateDTO = $this->client->updateFormation($formationUpdate);
+
+        //assert
+        $this->assertInstanceOf(FormationResponse::class, $responseUpdateDTO);
+        $this->assertTrue($responseUpdateDTO->success);
+        $this->assertTrue($responseUpdateDTO->data !== null);
+    }
+    public function testGetFormation(): void
+    {
+           //arrange
+        $nameFormation = "Formation de test sans fichier";
+        $code = $this->codeFormation;
+        $formation = new FormationCreateRequest($nameFormation, $code);
+
+        $this->client->createFormation($formation);
+        //act
+        $formationGetRequest = new FormationGetRequest('cl_formation_' . $code);
+        $responseDTO = $this->client->getFormation($formationGetRequest);
+        //assert
+        $this->assertInstanceOf(FormationResponse::class, $responseDTO);
+        $this->assertTrue($responseDTO->success);
     }
 }
