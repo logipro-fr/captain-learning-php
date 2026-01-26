@@ -52,6 +52,9 @@ git clone https://github.com/logipro-fr/captain-learning-php
 cd captain-learning-php
 ./install --profile devlocal
 ```
+
+For more details about JWT token configuration during installation, see [JWT TTL Configuration](docs/JWT_TTL_CONFIGURATION.md).
+
 ### Requirements
 
 * docker
