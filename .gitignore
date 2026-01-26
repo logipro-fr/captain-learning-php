@@ -4,3 +4,4 @@
 
 .env.local
 .phpunit.result.cache
+config/packages/lexik_jwt_authentication_local.yaml

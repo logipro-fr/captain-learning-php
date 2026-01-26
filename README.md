@@ -70,6 +70,7 @@ To install locally or on a development server, be careful with the following env
 * LOCALDEV_WORKING_DIR: working directory useful for development (default: undefined)
 * URL_API: override the base URL used by internal API clients (default: empty)
 * PULL_POLICY: policy for pulling the PHP built image on start (default: missing)
+* JWT_TTL: JWT token time-to-live in seconds (default: 3600)
 
 Typical local development .env.local:
 
