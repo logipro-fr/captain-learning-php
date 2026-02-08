@@ -43,6 +43,12 @@ $formation = new FormationCreateRequest(
 $client->createFormation($formation);
 ```
 
+## FAQ
+
+### À quoi sert le décalage de la SAIS sur l'axe Y ?
+
+Le décalage sur l'axe Y sert à ajuster la position verticale de la zone de saisie dans l'interface. Ce client PHP n'applique pas ce réglage : il est géré par les interfaces qui consomment l'API.
+
 ## Contributing
 
 ### Install
